@@ -7,7 +7,8 @@ import starlight from "@astrojs/starlight";
 export default defineConfig({
   site: "https://fluxcord.jbcrn.dev",
   redirects: {
-    "/discord/invite/": "/getting-started/"
+    "/discord/invite/": "/getting-started/",
+    "/": "/getting-started/"
   },
   trailingSlash: "always",
   integrations: [
