@@ -15,12 +15,12 @@ export default defineConfig({
         },
       ],
       logo: {
-        src: "./src/assets/docs.svg",
+        light: "./src/assets/docs-light.svg",
+        dark: "./src/assets/docs-dark.svg",
         replacesTitle: true,
       },
       social: [
         {
-          //@ts-expect-error
           icon: "fluxer",
           label: "Fluxer",
           href: "https://fluxer.gg/waf",

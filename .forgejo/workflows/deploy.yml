@@ -1,0 +1,68 @@
+name: Deploy Fluxcord site
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  build:
+    runs-on: debian-unprivileged-runner
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: https://github.com/pnpm/action-setup@v3
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Astro site
+        run: pnpm run build
+        env:
+          NODE_ENV: production
+
+      - name: Upload generated files
+        uses: actions/upload-artifact@v3
+        with:
+          name: Generated files
+          path: dist/
+          include-hidden-files: true
+
+  deploy:
+    needs: [ build ]
+    runs-on: debian-unprivileged-runner
+    steps:
+      - name: Clone the repository
+        uses: https://code.forgejo.org/actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Checkout the target branch and clean it up
+        run: |
+          git checkout pages || git switch --orphan pages && \
+          rm -Rfv $(ls -A | egrep -v '^(\.git|LICENSE)$')
+
+      - name: Download generated files
+        uses: https://code.forgejo.org/actions/download-artifact@v3
+        with:
+          name: Generated files
+
+      - name: Publish the website
+        run: |
+          git config user.email gitgay-ci && \
+          git config user.name "git.gay Actions" && \
+          git add . && \
+          git commit --allow-empty --message "Pages build for ${GITHUB_SHA}" && \
+          git push origin pages
