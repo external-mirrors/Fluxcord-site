@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: debian-unprivileged-runner
+    runs-on: docker
     
     steps:
       - name: Checkout repository
@@ -41,7 +41,7 @@ jobs:
 
   deploy:
     needs: [ build ]
-    runs-on: debian-unprivileged-runner
+    runs-on: docker
     steps:
       - name: Clone the repository
         uses: https://code.forgejo.org/actions/checkout@v4
