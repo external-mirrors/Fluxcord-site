@@ -1,0 +1,12 @@
+
+* {
+  border-radius: 0 !important;
+}
+
+*:not(code) {
+  font-family: 'Gabarito', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Outfit', sans-serif;
+}

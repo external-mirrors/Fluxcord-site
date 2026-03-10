@@ -2,6 +2,34 @@
 title: Getting started with Fluxcord
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside, LinkButton, Steps } from '@astrojs/starlight/components';
+
+This guide sets your server up for bridging to Fluxer.
 
 <Aside>If you're self hosting, go to the [Self-hosted guide](/self-hosting).</Aside>
+
+<Steps>
+
+1. Firstly, you need to invite the bot on both sides.
+
+   <LinkButton
+    href="https://web.fluxer.app/oauth2/authorize?client_id=1474209901993570338&scope=bot&permissions=2260735261797440"
+    icon="fluxer"
+    iconPlacement="start"
+   >
+    Invite on Fluxer
+   </LinkButton> <LinkButton
+    href="https://web.fluxer.app/oauth2/authorize?client_id=1474209901993570338&scope=bot&permissions=2260735261797440"
+    icon="discord"
+    iconPlacement="start"
+   >
+    Invite on Discord
+   </LinkButton>
+
+2. On the channel you want to bridge, run `fc!setup`.
+
+3. Fluxcord should reply to you with a command to put on the other side. Copy it and send it on the other side.
+
+4. Congratulations, your Discord channel is now bridged!
+
+</Steps>

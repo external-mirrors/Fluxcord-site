@@ -5,6 +5,11 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://fluxcord.jbcrn.dev",
+  redirects: {
+    "/discord/invite/": "/getting-started/"
+  },
+  trailingSlash: "always",
   integrations: [
     starlight({
       title: "Fluxcord Documentation",
@@ -12,6 +17,10 @@ export default defineConfig({
         {
           label: "Getting started",
           link: "/getting-started",
+        },
+        {
+          label: "Self-hosting",
+          link: "/self-hosting",
         },
       ],
       logo: {
@@ -37,8 +46,9 @@ export default defineConfig({
         },
       ],
       editLink: {
-        baseUrl: "https://git.gay/Fluxcord/site/_edit/main"
-      }
+        baseUrl: "https://git.gay/Fluxcord/site/_edit/master",
+      },
+      customCss: ["./src/styles/global.css", "./src/styles/docs.css"],
     }),
   ],
 });
