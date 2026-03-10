@@ -20,7 +20,7 @@ export default defineConfig({
         },
         {
           label: "Self-hosting",
-          link: "/self-hosting",
+          link: "/self-hosting"
         },
       ],
       logo: {

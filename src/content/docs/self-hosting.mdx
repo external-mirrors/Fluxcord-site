@@ -1,8 +1,137 @@
 ---
-title: Self-hosting Fluxcord
+title: Self-hosting
 ---
 
-import { Aside, LinkButton, Steps } from '@astrojs/starlight/components';
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 This guide sets you up with a self-hosted Fluxcord bot.
 
+## Prerequisites
+<Tabs syncKey='method'>
+<TabItem label="Docker/Podman (recommended)">
+- A system with Docker and Docker Compose (or Podman and Podman Compose)
+  <Aside type="caution">
+    Podman support is not tested by the devs. You can get support on it
+    but because we don't run Podman, we might have difficulties supporting
+    you.
+  </Aside>
+  {/* <Aside>
+    If you want voice and you're on Podman, enable Podman's Docker-compatible socket by:
+    ```bash
+    $ systemctl start podman.socket
+    $ systemctl enable podman.socket 
+    ```
+    Then, on the Docker compose file, replace `/var/run/docker.sock` to `/run/podman/podman.sock`
+
+    Else, Fluxcord won't be able to spawn voice sessions.
+  </Aside> */}
+</TabItem>
+<TabItem label="Bare-metal">
+<Aside type="caution">
+  After Fluxcord releases voice support, if you want voice, the only supported way is using **Docker or Podman**.
+</Aside>
+
+- A system with Node.js (>= 20)
+- A package manager such as `pnpm` (recommended) or `npm`.
+- Both Fluxer and Discord has Developer Mode enabled (go to Settings > Advanced and enable "Developer Mode")
+</TabItem>
+</Tabs>
+
+## Installing
+<Steps>
+1. Firstly, clone the Fluxcord repository.
+   ```bash
+   $ git clone https://git.gay/Fluxcord/core Fluxcord
+   ```
+2. Then, install dependencies.
+   ```bash
+   $ cd Fluxcord
+   $ pnpm install # or npm install if you didn't install pnpm
+   ```
+</Steps>
+
+## Making a bot (Discord)
+<Steps>
+1. Go to https://discord.com/developers/applications (log in if needed)
+2. Go to Applications, and create an application by clicking "New Application".
+3. Name your bot, accept the terms, and click "Create".
+4. Copy the Application ID. We'll need that, then go to Bot, then click "Reset Token".
+   Verify your Multi-factor Authentication if needed.
+5. Copy the generated token, we'll also need that.
+</Steps>
+
+## Making a bot (Fluxer)
+<Steps>
+1. Go to Settings > Applications, and create an application by clicking "Create Application".
+2. Name your bot, and click "Create".
+3. Copy the Application ID. We'll need that in the next step.
+4. Click "Reset Token". Verify your Multi-factor Authentication if needed.
+5. Copy the generated token, we'll need that.
+</Steps>
+
+## Making a community for temporary emojis (Fluxer)
+This is so the bot can store temporary bridged emojis. If you want to use an existing community you can skip to step 3.
+<Steps>
+1. Click "Add a Community", then "Create Community".
+2. Name it something, and click "Create Community".
+3. Now, invite the Fluxer bot by using this link. Replace the `[APP_ID]` to the Application ID
+   we got on the previous step.
+   ```
+   https://web.fluxer.app/oauth2/authorize?client_id=[APP_ID]&scope=bot&permissions=2260735261797440
+   ```
+4. After that, right click the community and click "Copy Community ID"
+</Steps>
+
+## Creating the config file
+<Steps>
+1. Copy the example config file and edit it:
+   ```bash
+   $ cp config.example.ts
+   $ nano config.example.ts # or vi, gedit, kwrite, emacs...
+   ```
+2. Put all the things that we got on the previous steps on it.
+3. Add your Discord and Fluxer accounts on the Admin account IDs by
+   right clicking your user and click "Copy User ID", then pasting it on
+   the `AdminAccountIds` field.
+4. Edit the data directory to where you want the Fluxcord data to be stored.
+   By default it will store it to `/data` which is not recommended for bare-metal
+   setups.
+</Steps>
+
+## Running the bot
+<Tabs syncKey='method'>
+<TabItem label="Docker/Podman (recommended)">
+<Steps>
+1. Run the bot.
+   ```bash
+   $ docker compose up -d --build # or podman-compose up -d --build
+   ```
+2. To see logs, just run
+   ```bash
+   $ docker compose logs -f
+   ```
+</Steps>
+</TabItem>
+<TabItem label="Bare-metal">
+<Steps>
+1. **Run the migrations**. Very important.
+   ``` bash
+   $ pnpm migrate # or npm run migrate
+   ```
+2. Now, run the bot.
+   ```bash
+   $ pnpm start # or npm run start
+   ```
+</Steps>
+
+<Aside>
+  You might want to put Fluxcord somewhere that can automatically start and restart it if it exits, e.g. systemd service.
+</Aside>
+</TabItem>
+</Tabs>
+
+
+## Inviting the bot
+The bot will output the invite links on the log/console. Those are the invite codes you use to invite the bot to your server.
+
+After that, go back to [Getting Started](/getting-started) and follow steps 2-4.
