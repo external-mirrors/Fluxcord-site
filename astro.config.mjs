@@ -22,6 +22,14 @@ export default defineConfig({
           label: "Self-hosting",
           link: "/self-hosting"
         },
+        {
+          label: "Privacy Policy",
+          link: "/privacy_policy"
+        },
+        {
+          label: "Terms of Service",
+          link: "/terms"
+        },
       ],
       logo: {
         light: "./src/assets/docs-light.svg",
