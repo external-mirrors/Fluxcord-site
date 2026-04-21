@@ -23,12 +23,12 @@ export default defineConfig({
           link: "/self-hosting"
         },
         {
-          label: "Privacy Policy",
-          link: "/privacy_policy"
-        },
-        {
           label: "Terms of Service",
           link: "/terms"
+        },
+        {
+          label: "Privacy Policy",
+          link: "/privacy"
         },
       ],
       logo: {
