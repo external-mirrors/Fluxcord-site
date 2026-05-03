@@ -40,12 +40,12 @@ export default defineConfig({
         {
           icon: "fluxer",
           label: "Fluxer",
-          href: "https://fluxer.gg/waf",
+          href: "https://fluxer.gg/jbcrn",
         },
         {
           icon: "discord",
           label: "Discord",
-          href: "https://discord.waf.moe",
+          href: "https://discord.jbcrn.dev",
         },
         {
           icon: "seti:git",
