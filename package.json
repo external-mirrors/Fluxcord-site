@@ -15,5 +15,8 @@
     "astro": "^5.17.1",
     "gsap": "^3.14.2",
     "unplugin-icons": "^23.0.1"
+  },
+  "patchedDependencies": {
+    "@astrojs/starlight@0.37.7": "patches/@astrojs__starlight.patch"
   }
 }
