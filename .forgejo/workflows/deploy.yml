@@ -42,7 +42,7 @@ jobs:
 
   deploy:
     needs: [ build ]
-    runs-on: docker
+    runs-on: rotfront-node
     steps:
       - name: Clone the repository
         uses: https://code.forgejo.org/actions/checkout@v4
