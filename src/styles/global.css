@@ -7,3 +7,21 @@
   font-family: 'Outfit';
   src: url(/fonts/Outfit-Black.ttf);
 }
+
+*:not(code) {
+  font-family: 'Gabarito', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Outfit', sans-serif;
+}
+
+.hero {
+  @media (width >= 50rem) {
+    grid-template-columns: 6fr 5fr;
+  }
+
+  img.heroImage {
+    max-width: 100%;
+  }
+}

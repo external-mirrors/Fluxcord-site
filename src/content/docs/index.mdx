@@ -1,0 +1,47 @@
+---
+title: Fluxcord
+template: splash
+editUrl: false
+lastUpdated: false
+hero:
+  title: Imagine bridging, but make it seamless
+  tagline: Fluxcord is a easy to use, set-and-forget bridging bot that bridges Fluxer communities and Discord servers.
+  image:
+    html: <img src="/fluxcord_hero_img.png" class="heroImage" />
+  actions:
+    - text: Get started
+      icon: right-arrow
+      link: /getting-started/
+    - text: Source code
+      icon: external
+      variant: minimal
+      link: https://git.gay/Fluxcord
+---
+
+import { CardGrid, Card } from '@astrojs/starlight/components';
+import FluxerHost from '../../components/FluxerHost.astro';
+
+<CardGrid stagger>
+	<Card title="Everything you expect on a bridge bot" icon="link">
+		It can bridge messages, replies, attachments, emojis, embeds, (bulk-)deletions, edits, and bots, just like any ordinary bridge bot.
+	</Card>
+	<Card title="Scream, cross-platform." icon="seti:audio">
+		Worried about missing a game night? Want to hang out with your friends that's still on the other side? No problem, with Fluxcord's Voice Bridging, you will just seamlessly talk to them, as if they're in the same VC!
+	</Card>
+	<Card title="Headpats-compatible." icon="comment-alt">
+		No more fighting with your bridge bot over unproxied messages, now with Fluxcord's compatibility with proxy bots, your proxied messages will be sent without any headaches.
+
+    Supports PluralKit, Tupperbox (discord bots), Fishing Bucket and PluralFlux (fluxer bots).
+	</Card>
+	<Card title="Free, as in freeeeeeeeeeeeeeeee..." icon="seti:license">
+		Fluxcord is licensed under MIT License, allowing you to view, modify and distribute Fluxcord’s code whatever you like.
+
+And the main bot will be always free, and that includes voice. It’s self hostable too! Check Fluxcord’s documentation about self hosting [here](/self-hosting/).
+	</Card>
+</CardGrid>
+
+<FluxerHost title="Funded by">
+FluxerHost is powering free infrastructure for Fluxer projects, such as Fluxcord!
+
+<a href="https://fluxer.host/">Learn more about FluxerHost</a>
+</FluxerHost>

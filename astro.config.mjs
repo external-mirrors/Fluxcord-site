@@ -48,6 +48,11 @@ export default defineConfig({
           href: "https://discord.jbcrn.dev",
         },
         {
+          icon: "fluxfur",
+          label: "FluxFur",
+          href: "https://fluxfur.com/invite/fluxcord",
+        },
+        {
           icon: "seti:git",
           label: "Repository",
           href: "https://git.gay/Fluxcord/core",
@@ -56,7 +61,7 @@ export default defineConfig({
       editLink: {
         baseUrl: "https://git.gay/Fluxcord/site/_edit/master",
       },
-      customCss: ["./src/styles/global.css", "./src/styles/docs.css"],
+      customCss: ["./src/styles/global.css", "./src/styles/docs.css", "./src/styles/landing.css"],
     }),
   ],
 });
