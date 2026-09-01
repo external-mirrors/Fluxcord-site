@@ -19,6 +19,11 @@ h1, h2, h3 {
 .hero {
   @media (width >= 50rem) {
     grid-template-columns: 6fr 5fr;
+    padding-top: 12px;
+  }
+
+  .hero-html {
+    justify-content: end;
   }
 
   img.heroImage {
