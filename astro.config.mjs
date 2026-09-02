@@ -8,6 +8,7 @@ export default defineConfig({
   site: "https://fluxcord.jbcrn.dev",
   redirects: {
     "/discord/invite/": "/getting-started/",
+    "/donate/": "https://fluxer.host/donate-fluxcord",
   },
   trailingSlash: "always",
   integrations: [
