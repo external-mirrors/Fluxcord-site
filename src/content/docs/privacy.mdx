@@ -2,9 +2,11 @@
 title: Privacy Policy
 ---
 
-**Last updated: May 9, 2026**
+**Last updated: September 5, 2026**
 
 This Privacy Policy describes what data Fluxcord collects, why it collects it, and how it's used. Fluxcord is a Discord &lt;-&gt; Fluxer message bridge bot. If you're a server administrator setting up bridging, or a user in a bridged channel, this document explains what happens to your data.
+
+> **Scope:** This policy applies only to the **Fluxcord Flagship instances** operated by JB. It does **not** apply to self-hosted instances, those are operated independently by their respective hosts, who control all data on their instance and are responsible for their own privacy practices.
 
 ---
 
@@ -28,7 +30,11 @@ When a bridge is configured, Fluxcord stores the following to make the bridge wo
 | Custom bot prefix (optional) | Per-guild override for the bot's command prefix |
 | Row timestamps | `createdAt` / `updatedAt` are automatically added by the database layer to every row |
 
-This data is stored in a SQLite database on the server running Fluxcord.
+This data is stored in an encrypted SQLite database (SQLCipher) on the server running the Flagship instance.
+
+### Voice bridge mappings
+
+When voice bridging is configured, Fluxcord stores only the linked channel/server IDs (Discord guild + channel ID, Fluxer guild + channel ID) so it knows which voice channels to connect. No audio, transcripts, or voice user lists are stored — see Section 6.
 
 ### Also Stored Persistently (per bridged message)
 
@@ -36,26 +42,32 @@ To support edit and deletion bridging, Fluxcord stores the following for each me
 
 | Data | Why it's stored |
 |---|---|
-| Message content (text) | Required to bridge edits to the other platform, and to render reply previews when a reply targets an older bridged message |
 | Discord message ID | To identify which bridged message to edit or delete |
 | Fluxer message ID | Same as above, for the Fluxer side |
+| Reply message IDs (Discord + Fluxer, if the message is a reply) | To link a reply to the bridged parent message on the other platform |
 | Originating platform | Whether the message was originally sent on Discord or Fluxer, so the bridge knows which side to mirror edits/deletes to |
 | Author user ID | To associate the bridged message with the original sender — used for edits, deletions, and attributing replies back to the correct user |
+| Associated bridge | Each mapping is linked to its bridge, so removing the bridge removes its message mappings |
 | Row timestamps | `createdAt` / `updatedAt` are automatically added by the database layer to every row |
 
-This data is stored for as long as the original message exists. It is **automatically deleted** when the original message is deleted on either platform. It is automatically removed if the bridge is later disabled or the bot is removed from the server.
+Message content (text) is **not** stored. It is only processed transiently in memory to deliver it to the other platform, then discarded. Reply/quoted text is likewise not stored — only the reply message IDs above.
+
+This data is stored for as long as the original message exists. It is **automatically deleted** when the original message is deleted on either platform. It is automatically removed when the bridge is removed, when a bridged channel is deleted, or when the bot is removed from a Discord server (see Section 5).
 
 ### Processed Transiently (not stored)
 
 The following passes through Fluxcord but is **not saved to disk**:
 
+- Message content (text), including quoted reply text
 - Attachments and embeds
 - Usernames and display names
 - User avatars (referenced by URL, not downloaded)
-- Reply metadata
 - Reactions and pins
 - Voice audio (streamed in real time, never recorded)
 - Voice channel join/leave events
+- Typing indicators
+
+Exception: if a server administrator has configured an error-logging channel, a message that fails to bridge may have its author display name, message link, and message text posted to that channel as an error report so admins can diagnose the failure. That error post lives on Discord/Fluxer like any other message — it is not stored in Fluxcord's database.
 
 ---
 
@@ -63,15 +75,15 @@ The following passes through Fluxcord but is **not saved to disk**:
 
 - We do not build profiles on individual users. Author IDs are stored only in relation to specific bridged messages — used for edit bridging, delete bridging, and attributing replies back to the original sender — not for any tracking purpose.
 - We do not use analytics or tracking tools to profile users or monitor behavior across communities.
-- We may collect aggregate operational telemetry and service logs for reliability, debugging, abuse prevention, and performance monitoring. This may include counters and technical events related to bridge health, but does not include recorded voice audio and is not used to build user profiles.
+- We may collect aggregate operational telemetry and service logs for reliability, debugging, abuse prevention, and performance monitoring. This may include counters and technical events related to bridge health, but does not include message content or recorded voice audio and is not used to build user profiles.
 
 ---
 
 ## 3. Who Has Access to This Data
 
-If you're using the **hosted version** of Fluxcord, the owner of Fluxcord (JB) has access to the database, which contains the channel and webhook data described in Section 1.
+If you're using a **Fluxcord Flagship (hosted) instance**, the operator of that instance (JB) has access to the database, which contains the channel and webhook data described in Section 1.
 
-If you're **self-hosting** Fluxcord, you control all the data entirely. The Fluxcord developers or the Fluxcord owner have no access to anything running on your instance.
+If you're using a **self-hosted** instance, that instance's operator controls all the data entirely. The Fluxcord developers and the Flagship operator have no access to anything running on a self-hosted instance.
 
 ---
 
@@ -89,9 +101,9 @@ The external services involved are:
 
 ## 5. Data Retention
 
-Bridge configuration data (channel IDs, webhook tokens, etc.) is retained until you manually remove the bridge using the `unbridge` command.
+Bridge configuration data (channel IDs, webhook tokens, etc.) is retained until you manually remove the bridge using the `unbridge` command (voice bridges: `voiceunbridge`).
 
-Stored message content is deleted when the original message is deleted on either platform. It is not automatically purged when a bridge is removed or the bot is kicked — to have message data removed in those cases, contact us through the support community (see Section 10).
+Stored message ID mappings are deleted when the original message is deleted on either platform. They are automatically removed when the bridge is removed, when a bridged channel is deleted, or when the bot is removed from a Discord server. If a Fluxer community is deleted, contact us through the support community (see Section 10) to have any leftover data removed.
 
 If you want all data associated with your server removed, contact us through the support community (see Section 10).
 
@@ -109,7 +121,7 @@ Voice bridge processes run on servers hosted at [fluxer.host](https://fluxer.hos
 
 ## 7. Security
 
-Webhook tokens are stored in the database and are required for Fluxcord to function. If you're self-hosting, ensure your database file is not publicly accessible. On the hosted instance, access to the database is restricted to the server owner.
+Webhook tokens are stored encrypted in the database and are required for Fluxcord to function. If you're self-hosting, ensure your database file is not publicly accessible. (Database encryption is enabled on the Flagship instance; self-hosters generally don't need to enable it.) On the Flagship instance, access to the database is restricted to the server owner.
 
 Webhooks are created automatically by Fluxcord during `setup` — users do not create or manage them directly. If you believe a webhook token associated with Fluxcord has been compromised, run `unbridge` to remove the bridge; this deletes the webhooks Fluxcord created and invalidates their tokens. If any webhook remains in the channel afterwards, you can delete it manually via the channel's settings in Discord and Fluxer.
 

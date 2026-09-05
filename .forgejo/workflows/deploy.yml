@@ -34,7 +34,7 @@ jobs:
           NODE_ENV: production
 
       - name: Publish to Cloudflare Pages
-        run: pnpm dlx wrangler pages deploy dist --project-name=fluxcord --branch=master
+        run: pnpm dlx --allow-build=esbuild --allow-build=workerd wrangler pages deploy dist --project-name=fluxcord --branch=master
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
