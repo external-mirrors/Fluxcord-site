@@ -1,0 +1,141 @@
+---
+title: Self-hosting voice
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide sets you up with self-hosted voice bridging for your Fluxcord bot.
+
+<Aside type="caution">
+  Finish the [Self-hosting guide](/self-hosting/) first. Your bot needs to be
+  running before you add voice.
+</Aside>
+
+<Aside type="danger" title="Important Notes">
+  Fluxer does not currently support end-to-end voice encryption, that means
+  Fluxcord will bridge your Discord VC **unencrypted**. Aside from that, to bridge
+  voice data, **it will decrypt** DAVE-encoded data to be sent to Fluxer.
+
+  Please make sure you have discussed this clearly with your server members,
+  and add an easy-to-find disclaimer about the bridge.
+</Aside>
+
+## Prerequisites
+
+- A working self-hosted bot from the [Self-hosting guide](/self-hosting/)
+- Both Fluxer and Discord has Developer Mode enabled (go to Settings > Advanced and enable "Developer Mode")
+
+## Enabling voice on the bot
+
+<Steps>
+1. Firstly, open your `config.js`:
+   ```bash
+   $ nano config.js # or vi, gedit, kwrite, emacs...
+   ```
+2. Then, set a long random secret and enable voice:
+   ```js
+   RunnerSecret: "a-long-random-string",
+   VoiceBridgingEnabled: true,
+   ```
+   The secret is shared between the bot and the voice runner, so make it long
+   and random. Keep the default `RunnerWsPort` unless you know you need to change it.
+3. After that, restart the bot.
+   ```bash
+   $ docker compose up -d --build # or podman-compose up -d --build
+   ```
+</Steps>
+
+## Running the voice runner
+
+<Tabs syncKey='method'>
+<TabItem label="Docker/Podman (recommended)">
+<Steps>
+1. Firstly, clone the voice repository somewhere next to your bot folder.
+   ```bash
+   $ git clone https://git.gay/Fluxcord/voice fluxcord-voice
+   ```
+2. Then, create the env file and edit it:
+   ```bash
+   $ cd fluxcord-voice
+   $ cp .env.example .env
+   $ nano .env # or vi, gedit, kwrite, emacs...
+   ```
+3. Put the same secret from the previous step on it:
+   ```
+   CORE_WS_URL=ws://bot:8765
+   RUNNER_SECRET=a-long-random-string
+   ```
+   If your bot exposes a different port or hostname, change `CORE_WS_URL` to match.
+   `RUNNER_REGION` is optional, only set it if you run multiple runners.
+4. After that, make sure the runner joins the bot's network, then run it.
+   The bot's compose file creates a network called `fluxcord-net`, and the
+   runner's compose file expects it, so just run:
+   ```bash
+   $ docker compose up -d --build # or podman-compose up -d --build
+   ```
+5. To see logs, just run
+   ```bash
+   $ docker compose logs -f
+   ```
+   Look for `Connected to core`. If you see that, the runner is ready.
+</Steps>
+</TabItem>
+<TabItem label="Bare-metal">
+<Aside type="caution">
+  Voice is only supported on **Docker or Podman**. Bare-metal works, but the devs
+  don't test it, so you are on your own.
+</Aside>
+<Steps>
+1. Firstly, clone the voice repository and install dependencies.
+   ```bash
+   $ git clone https://git.gay/Fluxcord/voice fluxcord-voice
+   $ cd fluxcord-voice
+   $ pnpm install # or npm install if you didn't install pnpm
+   ```
+2. Then, set the env vars to point at your bot and use the same secret:
+   ```bash
+   $ export CORE_WS_URL=ws://localhost:8765
+   $ export RUNNER_SECRET=a-long-random-string
+   ```
+3. Now, run the runner.
+   ```bash
+   $ node runner.js
+   ```
+   Look for `Connected to core`. If you see that, the runner is ready.
+</Steps>
+
+<Aside>
+  You might want to put the runner somewhere that can automatically start and restart it if it exits, e.g. systemd service.
+</Aside>
+</TabItem>
+</Tabs>
+
+## Bridging multiple voice channels in one server
+
+Discord only lets one bot user join one voice channel per server at a time.
+So to bridge two voice channels in the same server at the same time, you need
+an extra Discord application per extra channel.
+
+<Steps>
+1. Firstly, make another bot by following the Making a bot (Discord) steps on
+   the [Self-hosting guide](/self-hosting/). You only need the token,
+   no Message Content Intent needed. Invite it to your server with the
+   View Channel, Connect, Send Messages, Use Voice Activity, and Speak permissions.
+2. Then, add its token to your `config.js`:
+   ```js
+   DiscordVoiceTokens: [
+     "VOICE_TOKEN_1",
+   ],
+   ```
+3. After that, restart the bot.
+   ```bash
+   $ docker compose up -d --build # or podman-compose up -d --build
+   ```
+</Steps>
+
+<Aside>
+  You need one token per voice channel you want bridged at the same time in one
+  server, counting the main bot. So two channels means one extra token, three
+  channels means two extra tokens. If there is no free bot left, the bot will
+  skip the join and log it.
+</Aside>

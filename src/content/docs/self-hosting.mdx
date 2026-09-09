@@ -99,6 +99,27 @@ This is so the bot can store temporary bridged emojis. If you want to use an exi
    setups. **Do not touch this if on Docker.**
 </Steps>
 
+## Pointing at a self-hosted Fluxer instance
+
+If your bot bridges to a self-hosted Fluxer instance instead of fluxer.app,
+do this when creating the config file:
+
+<Steps>
+1. Firstly, open your `config.js`:
+   ```bash
+   $ nano config.js # or vi, gedit, kwrite, emacs...
+   ```
+2. Then, point the bot at your instance:
+   ```js
+   FluxerAPIBaseURL: "https://example.com/api",
+   ```
+   Make sure the Fluxer bot token, Application ID, and temporary emoji community
+   all come from your instance as well.
+3. If you use voice bridging later, make sure the voice runner can reach your
+   instance's LiveKit URL. The runner gets the LiveKit address from your Fluxer
+   server, so make sure that is accessible to the bot.
+</Steps>
+
 ## Running the bot
 <Tabs syncKey='method'>
 <TabItem label="Docker/Podman (recommended)">
@@ -136,3 +157,6 @@ This is so the bot can store temporary bridged emojis. If you want to use an exi
 The bot will output the invite links on the log/console. Those are the invite codes you use to invite the bot to your server.
 
 After that, go back to [Getting Started](/getting-started) and follow steps 2-4.
+
+## Voice bridging (optional)
+If you want voice bridging, follow the [Self-hosting voice guide](/self-hosting-voice/) after the bot is running.

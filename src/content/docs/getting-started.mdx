@@ -50,6 +50,38 @@ This guide sets your server up for bridging to Fluxer.
 
 3. Fluxcord should reply to you with a command to put on the other side. Copy it and send it on the other side.
 
-4. Congratulations, your Discord channel is now bridged!
+ 4. Congratulations, your Discord channel is now bridged!
 
-</Steps>
+ </Steps>
+
+ ## Bridging a voice channel
+ <Steps>
+
+ 1. Firstly, run `fc!setup` on the voice channel you want to bridge, on either side.
+    <Aside type="note">
+    Change `fc!` to your instance's prefix if `fc!` did not work (e.g. if you're using Fluxcord on FluxFur, use `fcfur!setup`)
+    </Aside>
+
+ 2. Fluxcord should reply to you with a command to put on the other side. Copy it and send it on the voice channel you want to bridge to.
+
+ 3. Congratulations, your voice channel is now bridged! Join either side and you should hear the other side.
+      <Aside type="note">
+      If you think your server usually have multiple voice channels active at the same time, you can invite
+      additional voice bridging bots below. This is optional as the main bot is also capable of voice bridging.
+
+      <LinkButton
+      href="https://discord.com/oauth2/authorize?client_id=1547302308218540112&permissions=36703232&integration_type=0&scope=bot"
+      icon="discord"
+      iconPlacement="start"
+      >
+      Invite voice bot 1
+      </LinkButton> <LinkButton
+      href="https://discord.com/oauth2/authorize?client_id=1547302389747290202&permissions=36703232&integration_type=0&scope=bot"
+      icon="discord"
+      iconPlacement="start"
+      >
+      Invite voice bot 2
+      </LinkButton>
+      </Aside>
+
+ </Steps>

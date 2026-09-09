@@ -24,6 +24,10 @@ export default defineConfig({
           link: "/self-hosting"
         },
         {
+          label: "Self-hosting voice",
+          link: "/self-hosting-voice"
+        },
+        {
           label: "Terms of Service",
           link: "/terms"
         },
