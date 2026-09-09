@@ -11,26 +11,8 @@ This guide sets your server up for bridging to Fluxer.
 <Steps>
 
 1. Firstly, you need to invite the bot on both sides.
-
-   <Aside type="note">
-   There are currently 2 flagship Fluxcord instances:
-   ##### Flagship 1 (full on Discord) - prefix: `fc!`
    <LinkButton
     href="https://web.fluxer.app/oauth2/authorize?client_id=1474209901993570338&scope=bot&permissions=2260735261797440"
-    icon="fluxer"
-    iconPlacement="start"
-   >
-    Invite on Fluxer
-   </LinkButton> <LinkButton
-    href="https://discord.com/oauth2/authorize?client_id=1474209670259409211"
-    icon="discord"
-    iconPlacement="start"
-   >
-    Invite on Discord
-   </LinkButton>
-   ##### Flagship 2 - prefix: `fc2!`
-   <LinkButton
-    href="https://web.fluxer.app/oauth2/authorize?client_id=1500355990246776845&scope=bot&permissions=2260735261797440"
     icon="fluxer"
     iconPlacement="start"
    >
@@ -42,7 +24,6 @@ This guide sets your server up for bridging to Fluxer.
    >
     Invite on Discord
    </LinkButton>
-   </Aside>
 
    <Aside type="note">
    In other Fluxer instances (aka not fluxer.app), there are currently a flagship instance on these instances:
@@ -63,6 +44,9 @@ This guide sets your server up for bridging to Fluxer.
    </Aside>
 
 2. On the channel you want to bridge, run `fc!setup`.
+   <Aside type="note">
+   Change `fc!` to your instance's prefix if `fc!` did not work (e.g. if you're using Fluxcord on FluxFur, use `fcfur!setup`)
+   </Aside>
 
 3. Fluxcord should reply to you with a command to put on the other side. Copy it and send it on the other side.
 
