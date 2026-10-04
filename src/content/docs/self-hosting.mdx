@@ -6,47 +6,64 @@ import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
 This guide sets you up with a self-hosted Fluxcord bot.
 
+<Aside>
+  Throughout this guide, when you edit a file with `nano`, save with Ctrl+O then Enter, and close with Ctrl+X.
+</Aside>
+
 ## Prerequisites
-<Tabs syncKey='method'>
-<TabItem label="Docker/Podman (recommended)">
-- A system with Docker and Docker Compose (or Podman and Podman Compose)
+- A system with Docker and Docker Compose (install [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows/macOS, or [Docker Engine](https://docs.docker.com/engine/install/) on Linux).
+- Both Fluxer and Discord has Developer Mode enabled (go to Settings > Advanced and enable "Developer Mode")
   <Aside type="caution">
     Podman support is not tested by the devs. You can get support on it
     but because we don't run Podman, we might have difficulties supporting
     you.
   </Aside>
-  {/* <Aside>
-    If you want voice and you're on Podman, enable Podman's Docker-compatible socket by:
-    ```bash
-    $ systemctl start podman.socket
-    $ systemctl enable podman.socket 
-    ```
-    Then, on the Docker compose file, replace `/var/run/docker.sock` to `/run/podman/podman.sock`
-
-    Else, Fluxcord won't be able to spawn voice sessions.
-  </Aside> */}
-</TabItem>
-<TabItem label="Bare-metal">
-<Aside type="caution">
-  After Fluxcord releases voice support, if you want voice, the only supported way is using **Docker or Podman**.
-</Aside>
-
-- A system with Node.js (>= 20)
-- A package manager such as `pnpm` (recommended) or `npm`.
-- Both Fluxer and Discord has Developer Mode enabled (go to Settings > Advanced and enable "Developer Mode")
-</TabItem>
-</Tabs>
 
 ## Installing
 <Steps>
-1. Firstly, clone the Fluxcord repository.
+1. Firstly, make a folder for Fluxcord and enter it.
    ```bash
-   $ git clone https://git.gay/Fluxcord/core Fluxcord
+   mkdir fluxcord
+   cd fluxcord
    ```
-2. Then, install dependencies.
+2. Then, create a file called `docker-compose.yml` and paste this into it.
    ```bash
-   $ cd Fluxcord
-   $ pnpm install # (BARE METAL ONLY) or npm install if you didn't install pnpm
+   nano docker-compose.yml
+   ```
+   ```yaml
+   services:
+     bot:
+       image: git.gay/fluxcord/core:latest
+       restart: on-failure
+       volumes:
+         - ./data:/data
+         - ./config.js:/app/config.js
+       expose:
+         - "8080"
+       healthcheck:
+         test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+         interval: 30s
+         timeout: 5s
+         start_period: 60s
+         retries: 3
+       networks:
+         - fluxcord-net
+
+   networks:
+     fluxcord-net:
+       driver: bridge
+       name: fluxcord-net
+   ```
+   `./data` is where the bot's database and files live.
+
+   `./config.js` is the config file we'll edit later.
+3. Download the example config file as `config.js`:
+   ```bash
+   curl -o config.js https://git.gay/Fluxcord/core/raw/branch/main/config.example.js
+   ```
+   Or, if you have wget:
+   ```bash
+   wget -O config.js https://git.gay/Fluxcord/core/raw/branch/main/config.example.js
    ```
 </Steps>
 
@@ -73,41 +90,63 @@ This guide sets you up with a self-hosted Fluxcord bot.
 ## Making a community for temporary emojis (Fluxer)
 This is so the bot can store temporary bridged emojis. If you want to use an existing community you can skip to step 3.
 <Steps>
-1. Click "Add a Community", then "Create Community".
+1. Scroll all the way down the left sidebar, click the **+** button (Create or join a community), then click "Create Community".
 2. Name it something, and click "Create Community".
 3. Now, invite the Fluxer bot by using this link. Replace the `[APP_ID]` to the Application ID
    we got on the previous step.
    ```
    https://web.fluxer.app/oauth2/authorize?client_id=[APP_ID]&scope=bot&permissions=2260735261797440
    ```
+   If you're pointing the bot at a self-hosted Fluxer instance, replace `web.fluxer.app` with your instance's address.
 4. After that, right click the community and click "Copy Community ID"
 </Steps>
 
-## Creating the config file
+## Editing the config file
 <Steps>
-1. Copy the example config file and edit it:
+1. Firstly, open the config file.
    ```bash
-   $ cp config.example.js config.js
-   $ nano config.js # or vi, gedit, kwrite, emacs...
+   nano config.js # or vi, gedit, kwrite, emacs...
    ```
-2. Put all the things that we got on the previous steps on it.
+2. Then, fill in the values you got from the previous steps.
+   ```js
+   DiscordBotToken: "...", // Discord bot token
+   DiscordClientId: "...", // Discord Application ID
+   FluxerBotToken: "...", // Fluxer bot token
+   FluxerTempEmojiGuildId: "...", // temporary emoji community ID
+   ```
 3. Add your Discord and Fluxer accounts on the Admin account IDs by
    right clicking your user and click "Copy User ID", then pasting it on
    the `AdminAccountIds` field.
-4. If bare-metal: Edit the data directory to where you want the Fluxcord data to be stored.
-   By default it will store it to `/data` which is not recommended for bare-metal
-   setups. **Do not touch this if on Docker.**
+   ```js
+   AdminAccountIds: ["YOUR_DISCORD_ID", "YOUR_FLUXER_ID"],
+   ```
 </Steps>
+
+<Aside>
+  The other fields in `config.js` are optional and have comments explaining them.
+</Aside>
+
+### Using PostgreSQL (optional)
+Fluxcord uses SQLite by default, which is fine for almost everyone. To use PostgreSQL instead, set `PostgresConnectionString`:
+```js
+PostgresConnectionString: "postgres://user:password@host:5432/fluxcord",
+```
+`DatabaseEncryptionToken` only applies to SQLite and is ignored when Postgres is set. Migrations run automatically on start.
+
+To move existing SQLite data into Postgres:
+```bash
+docker compose exec bot pnpm run migrate:to-postgres
+```
 
 ## Pointing at a self-hosted Fluxer instance
 
 If your bot bridges to a self-hosted Fluxer instance instead of fluxer.app,
-do this when creating the config file:
+do this when editing the config file:
 
 <Steps>
 1. Firstly, open your `config.js`:
    ```bash
-   $ nano config.js # or vi, gedit, kwrite, emacs...
+   nano config.js # or vi, gedit, kwrite, emacs...
    ```
 2. Then, point the bot at your instance:
    ```js
@@ -121,42 +160,84 @@ do this when creating the config file:
 </Steps>
 
 ## Running the bot
-<Tabs syncKey='method'>
-<TabItem label="Docker/Podman (recommended)">
 <Steps>
 1. Run the bot.
    ```bash
-   $ docker compose up -d --build # or podman-compose up -d --build
+   docker compose up -d
    ```
+   The image is pulled automatically, and migrations run on first start.
 2. To see logs, just run
    ```bash
-   $ docker compose logs -f
-   ```
-</Steps>
-</TabItem>
-<TabItem label="Bare-metal">
-<Steps>
-1. **Run the migrations**. Very important.
-   ``` bash
-   $ pnpm migrate # or npm run migrate
-   ```
-2. Now, run the bot.
-   ```bash
-   $ pnpm start # or npm run start
+   docker compose logs -f
    ```
 </Steps>
 
-<Aside>
-  You might want to put Fluxcord somewhere that can automatically start and restart it if it exits, e.g. systemd service.
-</Aside>
-</TabItem>
-</Tabs>
+## Updating Fluxcord
+```bash
+docker compose pull
+docker compose up -d --force-recreate
+```
+This downloads the newest image and restarts the bot.
 
+To check whether new settings were added:
+```bash
+curl -o config.example.js https://git.gay/Fluxcord/core/raw/branch/main/config.example.js
+```
+Or, if you have wget:
+```bash
+wget -O config.example.js https://git.gay/Fluxcord/core/raw/branch/main/config.example.js
+```
+```bash
+diff config.example.js config.js
+```
+
+## Ports and networking
+You don't need to open any ports. Fluxcord only makes outbound connections to Discord and Fluxer.
+
+- `8080` is the healthcheck endpoint (`/health`). It's only reachable inside Docker; to view it from the host, add this to the `bot` service:
+  ```yaml
+  ports:
+    - "8080:8080"
+  ```
+- `8765` (`RunnerWsPort`) is used between the bot and the voice runner. Keep it internal. Only publish it if the voice runner runs on a different server.
 
 ## Inviting the bot
 The bot will output the invite links on the log/console. Those are the invite codes you use to invite the bot to your server.
 
-After that, go back to [Getting Started](/getting-started) and follow steps 2-4.
+After that, go to [Getting Started](/getting-started) and follow steps 2-4.
 
 ## Voice bridging (optional)
 If you want voice bridging, follow the [Self-hosting voice guide](/self-hosting-voice/) after the bot is running.
+
+To run the bot and the voice runner together from one file, use this `docker-compose.yml` instead:
+```yaml
+services:
+  bot:
+    image: git.gay/fluxcord/core:latest
+    restart: on-failure
+    volumes:
+      - ./data:/data
+      - ./config.js:/app/config.js
+    networks:
+      - fluxcord-net
+
+  voice:
+    image: git.gay/fluxcord/voice:latest
+    restart: unless-stopped
+    environment:
+      - CORE_WS_URL=${CORE_WS_URL:-ws://bot:8765}
+      - RUNNER_SECRET=${RUNNER_SECRET:-}
+      - RUNNER_REGION=${RUNNER_REGION:-}
+    networks:
+      - fluxcord-net
+
+networks:
+  fluxcord-net:
+    driver: bridge
+    name: fluxcord-net
+```
+The bot's service is named `bot` here, so the voice runner reaches it at `ws://bot:8765`. Create a `.env` file next to it with the same secret you'll put in `config.js`:
+```
+RUNNER_SECRET=your-long-random-secret
+```
+Then enable voice in `config.js` and start everything (the [Self-hosting voice guide](/self-hosting-voice/) covers the rest).
