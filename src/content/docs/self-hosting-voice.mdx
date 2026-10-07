@@ -27,88 +27,77 @@ This guide sets you up with self-hosted voice bridging for your Fluxcord bot.
 
 ## Enabling voice on the bot
 
+The bot and the voice runner share a secret password so they can trust each other. You'll generate it here and reuse it in the next section.
+
 <Steps>
-1. Firstly, open your `config.js`:
+1. Firstly, generate a random secret and copy the output.
    ```bash
-   $ nano config.js # or vi, gedit, kwrite, emacs...
+   openssl rand -hex 32
    ```
-2. Then, set a long random secret and enable voice:
+2. Then, open your `config.js`:
+   ```bash
+   nano config.js # or vi, gedit, kwrite, emacs...
+   ```
+3. Set the secret to what you copied and enable voice:
    ```js
-   RunnerSecret: "a-long-random-string",
+   RunnerSecret: "paste-the-secret-here",
    VoiceBridgingEnabled: true,
    ```
-   The secret is shared between the bot and the voice runner, so make it long
-   and random. Keep the default `RunnerWsPort` unless you know you need to change it.
-3. After that, restart the bot.
+   Keep the default `RunnerWsPort` unless you know you need to change it.
+4. After that, restart the bot.
    ```bash
-   $ docker compose up -d --build # or podman-compose up -d --build
+   docker compose up -d
    ```
 </Steps>
 
 ## Running the voice runner
 
-<Tabs syncKey='method'>
-<TabItem label="Docker/Podman (recommended)">
+The voice runner is a second container that sits next to your bot. It connects to the bot over a WebSocket using the secret from the previous step.
+
 <Steps>
-1. Firstly, clone the voice repository somewhere next to your bot folder.
+1. Firstly, add the voice runner to your `docker-compose.yml`. If you already used the combined file from the [Self-hosting guide](/self-hosting/), the `voice` service is already there and you can skip to step 3. Otherwise, open the file and add this under `services:`, next to your `bot` service:
    ```bash
-   $ git clone https://git.gay/Fluxcord/voice fluxcord-voice
+   nano docker-compose.yml
    ```
-2. Then, create the env file and edit it:
+   ```yaml
+   voice:
+     image: git.gay/fluxcord/voice:latest
+     restart: unless-stopped
+     environment:
+       - CORE_WS_URL=${CORE_WS_URL:-ws://bot:8765}
+       - RUNNER_SECRET=${RUNNER_SECRET:-}
+       - RUNNER_REGION=${RUNNER_REGION:-}
+     networks:
+       - fluxcord-net
+   ```
+2. Then, make sure the runner is pointed at your bot. `CORE_WS_URL` is where the runner reaches the bot. It defaults to `ws://bot:8765`, which matches the bot's service name in the combined file. If your bot's service is named differently, change `bot` to match.
+3. Create a `.env` file next to your `docker-compose.yml` with the same secret from the previous section:
    ```bash
-   $ cd fluxcord-voice
-   $ cp .env.example .env
-   $ nano .env # or vi, gedit, kwrite, emacs...
+   nano .env
    ```
-3. Put the same secret from the previous step on it:
    ```
-   CORE_WS_URL=ws://bot:8765
-   RUNNER_SECRET=a-long-random-string
+   RUNNER_SECRET=paste-the-secret-here
    ```
-   If your bot exposes a different port or hostname, change `CORE_WS_URL` to match.
-   `RUNNER_REGION` is optional, only set it if you run multiple runners.
-4. After that, make sure the runner joins the bot's network, then run it.
-   The bot's compose file creates a network called `fluxcord-net`, and the
-   runner's compose file expects it, so just run:
+4. Now, start everything.
    ```bash
-   $ docker compose up -d --build # or podman-compose up -d --build
+   docker compose up -d
    ```
-5. To see logs, just run
+5. To check that it worked, look at the logs.
    ```bash
-   $ docker compose logs -f
+   docker compose logs -f
    ```
-   Look for `Connected to core`. If you see that, the runner is ready.
-</Steps>
-</TabItem>
-<TabItem label="Bare-metal">
-<Aside type="caution">
-  Voice is only supported on **Docker or Podman**. Bare-metal works, but the devs
-  don't test it, so you are on your own.
-</Aside>
-<Steps>
-1. Firstly, clone the voice repository and install dependencies.
-   ```bash
-   $ git clone https://git.gay/Fluxcord/voice fluxcord-voice
-   $ cd fluxcord-voice
-   $ pnpm install # or npm install if you didn't install pnpm
-   ```
-2. Then, set the env vars to point at your bot and use the same secret:
-   ```bash
-   $ export CORE_WS_URL=ws://localhost:8765
-   $ export RUNNER_SECRET=a-long-random-string
-   ```
-3. Now, run the runner.
-   ```bash
-   $ node runner.js
-   ```
-   Look for `Connected to core`. If you see that, the runner is ready.
+   Look for `Connected to core`. If you see that, the runner is ready. If not, the two most common causes are a `RUNNER_SECRET` that doesn't match the one in `config.js`, or a `CORE_WS_URL` that points at the wrong service name.
 </Steps>
 
 <Aside>
-  You might want to put the runner somewhere that can automatically start and restart it if it exits, e.g. systemd service.
+  If you keep the runner in its own separate compose file, it has to join the bot's network. Mark it as external in that file:
+  ```yaml
+  networks:
+    fluxcord-net:
+      external: true
+      name: fluxcord-net
+  ```
 </Aside>
-</TabItem>
-</Tabs>
 
 ## Bridging multiple voice channels in one server
 
@@ -129,7 +118,7 @@ an extra Discord application per extra channel.
    ```
 3. After that, restart the bot.
    ```bash
-   $ docker compose up -d --build # or podman-compose up -d --build
+   docker compose up -d
    ```
 </Steps>
 
