@@ -36,8 +36,8 @@ export const GET: APIRoute = async ({ props }) => {
 
   const tspans = wrap(props.title.replace("Fluxcord: ", ''))
     .map(
-      (l, i) =>
-        `<tspan x="1811" dy="${i === 0 ? 24 : 77}">${escapeXml(l)}</tspan>`,
+      (l, i, a) =>
+        `<tspan x="1811" dy="${a.length > 1 ? (i === 0 ? 0 : 67) : 24}">${escapeXml(l)}</tspan>`,
     )
     .join("");
 
