@@ -12,8 +12,10 @@
   "dependencies": {
     "@astrojs/starlight": "^0.41.10",
     "@iconify/json": "^2.2.474",
+    "@resvg/resvg-js": "^2.6.2",
     "astro": "^7.2.10",
     "gsap": "^3.15.0",
+    "sharp": "^0.35.5",
     "unplugin-icons": "^23.0.1"
   },
   "patchedDependencies": {

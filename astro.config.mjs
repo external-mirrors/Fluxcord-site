@@ -10,10 +10,11 @@ export default defineConfig({
     "/discord/invite/": "/getting-started/",
     "/donate/": "https://fluxer.host/donate-fluxcord",
   },
-  trailingSlash: "always",
+  // trailingSlash: "always",
   integrations: [
     starlight({
       title: "Fluxcord Documentation",
+      routeMiddleware: "./src/routeData.ts",
       sidebar: [
         {
           label: "Getting started",
