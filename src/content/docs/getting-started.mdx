@@ -43,9 +43,12 @@ This guide sets your server up for bridging to Fluxer.
    </LinkButton>
    </Aside>
 
-2. On the channel you want to bridge, run `fc!setup`.
+2. On the channel you want to bridge, run `fc!bridge setup`.
    <Aside type="note">
    Change `fc!` to your instance's prefix if `fc!` did not work (e.g. if you're using Fluxcord on FluxFur, use `fcfur!bridge setup`)
+   </Aside>
+   <Aside type="tip">
+   Just created your Fluxer community using a Discord server template? Run `fc!bridge setup-all` instead. 
    </Aside>
 
 3. Fluxcord should reply to you with a command to put on the other side. Copy it and send it on the other side.
@@ -55,8 +58,16 @@ This guide sets your server up for bridging to Fluxer.
  </Steps>
 
  ## Bridging a voice channel
- <Steps>
+ <Aside type="danger" title="Important Notes">
+  Fluxer does not currently support end-to-end voice encryption, that means
+  Fluxcord will bridge your Discord VC **unencrypted**. Aside from that, to bridge
+  voice data, **it will decrypt** DAVE-encoded data to be sent to Fluxer.
 
+  Please make sure you have discussed this clearly with your server members,
+  and add an easy-to-find disclaimer about the bridge.
+</Aside>
+
+ <Steps>
  1. Firstly, run `fc!bridge setup` on the voice channel you want to bridge, on either side.
     <Aside type="note">
     Change `fc!` to your instance's prefix if `fc!` did not work (e.g. if you're using Fluxcord on FluxFur, use `fcfur!bridge setup`)
